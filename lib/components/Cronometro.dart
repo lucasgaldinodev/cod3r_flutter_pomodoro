@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:pomodoro/components/CronometroBotao.dart';
+import 'package:provider/provider.dart';
+import '../store/pomodoro.store.dart';
 
 class Cronometro extends StatelessWidget {
   const Cronometro({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<PomodoroStore>(context);
+
     return Container(
       color: Colors.red,
       child: Column(
@@ -19,40 +24,47 @@ class Cronometro extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            '25:00',
-            style: TextStyle(
+          Text(
+            '${store.minutos.toString().padLeft(2, '0')}:${store.segundos.toString().padLeft(2, '0')}',
+            style: const TextStyle(
               fontSize: 120,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: CronometroBotao(
-                  texto: 'Iniciar',
-                  icone: Icons.play_arrow,
+          Observer(
+            builder: (_) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (!store.iniciado)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: CronometroBotao(
+                      texto: 'Iniciar',
+                      icone: Icons.play_arrow,
+                      click: store.iniciar,
+                    ),
+                  ),
+                if (store.iniciado)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: CronometroBotao(
+                      texto: 'Parar',
+                      icone: Icons.stop,
+                      click: store.parar,
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: CronometroBotao(
+                    texto: 'Reiniciar',
+                    icone: Icons.refresh,
+                    click: store.reiniciar,
+                  ),
                 ),
-              ),
-              // Padding(
-              //   padding: EdgeInsets.only(right: 10),
-              //   child: CronometroBotao(
-              //     texto: 'Parar',
-              //     icone: Icons.stop,
-              //   ),
-              // ),
-              Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: CronometroBotao(
-                  texto: 'Reiniciar',
-                  icone: Icons.refresh,
-                ),
-              ),
-            ],
-          )
+              ],
+            ),
+          ),
         ],
       ),
     );
